@@ -2,7 +2,7 @@
 //
 // Submitted by: Ricardo G. Mora, Jr.  01/08/2022
 
-
+var lastUpdate = "01/01/2022";
 // define some base layers that the user can select from
 var streetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 19,
@@ -37,47 +37,43 @@ let earthquakes = new L.layerGroup();
 d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(
     function(response2){
         console.log(response2);
+        lastUpdate = moment.unix(response2.metadata.generated/1000).format("MM/DD/YYYY");
+        console.log("last updated: " + lastUpdate);
         L.geoJson(response2,{
             pointToLayer: function(feature, latlng) {
                 return L.circleMarker(latlng, {
-                    radius: getRadius(feature.properties.mag),
-                    color: "#000000",
+                    radius: feature.properties.mag * 6,
+                    color: "#000000", // black
                     opacity: 0.2,
                     weight: 1,
                     stroke: true,
                     fillColor: getColor(feature.geometry.coordinates[2]),
-                    fillOpacity: 0.5
+                    fillOpacity: 0.7
                 });},
             onEachFeature: function(feature, layer) {
                 layer.bindPopup(`Magnitude: <b>${feature.properties.mag}</b><br>
-                                 Depth: <b>${feature.geometry.coordinates[2]}</b><br>
-                                 Location: <b>${feature.properties.place}</b>`)
+                                 Depth: <b>${feature.geometry.coordinates[2]} km</b><br>
+                                 Location: <b>${feature.properties.place}</b><br>
+                                 When: <b>${moment.unix(feature.properties.time/1000)}</b>`)
             }
         }).addTo(earthquakes);
 });
+console.log(lastUpdate);
 
 // define a function to set the color of a marker based on a parameter (earthquake depth)
 function getColor(param){
     if (param > 90)
-        return "#FF0000";
+        return "#BF00FF"; // violet
     else if (param > 70)
-        return "#FF5500";
+        return "#0000FF";  // blue
     else if (param > 50)
-        return "#FFAA00";
-    else if (param > 30)  
-        return "#FFFF00";
+        return "#00FF00";  // green
+    else if (param > 30) 
+        return "#FFFF00";  // yellow
     else if (param > 10)
-        return "#AAFF00";
+        return "#FF8000";  // orange
     else
-        return "#55FF00";
-};
-
-// define a function to set the radius of a marker based on a parameter (earthquake magnitude)
-function getRadius(param){
-    if (param == 0)
-        return 1;
-    else
-        return param * 10;
+        return "#FA5858";  // red
 };
 
 // create an object containing the overlay layers (to make them selectable)
@@ -102,20 +98,33 @@ tectonicplates.addTo(myMap);
 L.control.layers(baseLayers, overlays, {collapsed:false}).addTo(myMap);
 
 // create the depth legend
-var legend = L.control({position: "bottomright"});
-legend.onAdd = function() {
-    let div = L.DomUtil.create("div", "info legend");
+var legend1 = L.control({position: "bottomright"});
+legend1.onAdd = function() {
+    let div1 = L.DomUtil.create("div", "info legend");
     let intervals = [0, 10, 30, 50, 70, 90];
-    div.innnerHTML = "<strong>Depth (km)</strong>";
+    let labels = ["<center><strong>Depth (km)</strong></center><hr>"];
     for (let i = 0; i < intervals.length; i++){
-        div.innerHTML += "<i style='background: "
+        labels.push("<i style='background: "
             + getColor(intervals[i]+1) + "'></i>"
             + intervals[i]
-            + (intervals[i+1] ? " to " + intervals[i+1] + "<br>" : "+");
+            + (intervals[i+1] ? " to " + intervals[i+1] + "<br>" : "+"));
     };
-    console.log(div);
-    return div;
+    div1.innerHTML = labels.join("");
+    return div1;
 };
 
-// display the legend on the map
-legend.addTo(myMap);
+// create the general information legend
+var legend2 = L.control({position: "bottomleft"});
+legend2.onAdd = function() {
+    let div2 = L.DomUtil.create("div", "info legend");
+    div2.innerHTML = "<b>Earthquake Magnitude Indicated by Circle Size</b><br>"
+        + "<center>(Click on a circle for earthquake details.)</center><hr>"
+        + "<center>Data Provided by the US Geological Survey</center><hr>"
+        + "<center>Last Updated on " + lastUpdate + "</center>";
+    return div2;
+};
+
+// display both legends on the map
+legend1.addTo(myMap);
+legend2.addTo(myMap);
+
