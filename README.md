@@ -1,19 +1,20 @@
-# javascript-plotly-challenge 
+# leaflet-challenge 
 
-This repository contains my solutions to Data Analytics Bootcamp Homework Assignment for week #14.
+This repository contains my solutions to Data Analytics Bootcamp Homework Assignment for week #15.
 
 #### Folders/Files:
 
 + **"docs"** (this is the main folder which contains the website source code) <br>
 	- *"index.html"* (website landing page) <br>
 	- **"static"** (subfolder) <br>
+		- **"css"** (subfolder) <br>
+			- *"style.css"* (stylesheet used by "index.html")
 		- **"js"** (subfolder) <br>
-			- *"app.js"* (javascript file to read JSON file and update graphic elements) <br>
-			- *"samples.json"* (JSON datafile used by *"app.js"*)
+			- *"logic.js"* (javascript file to query USGS earthquake data and display on map)
 	
 #### Deployed website: <br>
 
-https://rickmora98.github.io/javascript-plotly-challenge/ <br>
+https://rickmora98.github.io/leaflet-challenge/ <br>
 
 #### Note: <br>
 
@@ -22,5 +23,5 @@ Please do not delete, move, rename, or alter any of these folders and/or files. 
 Thank you. <br>
 
 #### Submitted by: <br>
- Ricardo G. Mora, Jr.  12/23/2021
+ Ricardo G. Mora, Jr.  01/08/2022
  
