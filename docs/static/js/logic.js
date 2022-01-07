@@ -77,7 +77,7 @@ function getRadius(param){
     if (param == 0)
         return 1;
     else
-        return param * 5;
+        return param * 10;
 };
 
 // create an object containing the overlay layers (to make them selectable)
@@ -105,13 +105,15 @@ L.control.layers(baseLayers, overlays, {collapsed:false}).addTo(myMap);
 var legend = L.control({position: "bottomright"});
 legend.onAdd = function() {
     let div = L.DomUtil.create("div", "info legend");
-    let intervals = [-10, 10, 30, 50, 70, 90];
+    let intervals = [0, 10, 30, 50, 70, 90];
+    div.innnerHTML = "<strong>Depth (km)</strong>";
     for (let i = 0; i < intervals.length; i++){
-        div.innerHTML += "<i style=background: "
-            + getColor(intervals[i]) + "'></i>"
+        div.innerHTML += "<i style='background: "
+            + getColor(intervals[i]+1) + "'></i>"
             + intervals[i]
-            + (intervals[i+1] ? "km &ndash km;" + intervals[i+1] + "km<br>" : "+");
+            + (intervals[i+1] ? " to " + intervals[i+1] + "<br>" : "+");
     };
+    console.log(div);
     return div;
 };
 
