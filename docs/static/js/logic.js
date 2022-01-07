@@ -2,7 +2,7 @@
 //
 // Submitted by: Ricardo G. Mora, Jr.  01/08/2022
 
-var lastUpdate = "01/01/2022";
+
 // define some base layers that the user can select from
 var streetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 19,
@@ -37,14 +37,13 @@ let earthquakes = new L.layerGroup();
 d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(
     function(response2){
         console.log(response2);
-        lastUpdate = moment.unix(response2.metadata.generated/1000).format("MM/DD/YYYY");
-        console.log("last updated: " + lastUpdate);
+        makeInfoLegend(moment.unix(response2.metadata.generated/1000).format("MM/DD/YYYY"));  // the info legend must be created during this function's execution
         L.geoJson(response2,{
             pointToLayer: function(feature, latlng) {
                 return L.circleMarker(latlng, {
                     radius: feature.properties.mag * 6,
                     color: "#000000", // black
-                    opacity: 0.2,
+                    opacity: 0.3,
                     weight: 1,
                     stroke: true,
                     fillColor: getColor(feature.geometry.coordinates[2]),
@@ -58,22 +57,21 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
             }
         }).addTo(earthquakes);
 });
-console.log(lastUpdate);
 
 // define a function to set the color of a marker based on a parameter (earthquake depth)
 function getColor(param){
     if (param > 90)
-        return "#BF00FF"; // violet
+        return "#E2A9F3"; // violet
     else if (param > 70)
-        return "#0000FF";  // blue
+        return "#81BEF7";  // blue
     else if (param > 50)
-        return "#00FF00";  // green
+        return "#58FA58";  // green
     else if (param > 30) 
-        return "#FFFF00";  // yellow
+        return "#F7FE2E";  // yellow
     else if (param > 10)
         return "#FF8000";  // orange
     else
-        return "#FA5858";  // red
+        return "#DF0101";  // red
 };
 
 // create an object containing the overlay layers (to make them selectable)
@@ -89,7 +87,7 @@ var myMap = L.map("map", {
     layers: [streetMap, satMap, topoMap]
 });
 
-// display the map with streetMap as the default base layer and also show the earthquakes and tectonic plate lines
+// display the map with streetMap as the default base layer and also show the earthquake markers and tectonic plate lines
 streetMap.addTo(myMap);
 earthquakes.addTo(myMap);
 tectonicplates.addTo(myMap);
@@ -97,7 +95,7 @@ tectonicplates.addTo(myMap);
 // display the layer control on the map
 L.control.layers(baseLayers, overlays, {collapsed:false}).addTo(myMap);
 
-// create the depth legend
+// create the depth legend and display on the map
 var legend1 = L.control({position: "bottomright"});
 legend1.onAdd = function() {
     let div1 = L.DomUtil.create("div", "info legend");
@@ -112,19 +110,20 @@ legend1.onAdd = function() {
     div1.innerHTML = labels.join("");
     return div1;
 };
-
-// create the general information legend
-var legend2 = L.control({position: "bottomleft"});
-legend2.onAdd = function() {
-    let div2 = L.DomUtil.create("div", "info legend");
-    div2.innerHTML = "<b>Earthquake Magnitude Indicated by Circle Size</b><br>"
-        + "<center>(Click on a circle for earthquake details.)</center><hr>"
-        + "<center>Data Provided by the US Geological Survey</center><hr>"
-        + "<center>Last Updated on " + lastUpdate + "</center>";
-    return div2;
-};
-
-// display both legends on the map
 legend1.addTo(myMap);
-legend2.addTo(myMap);
 
+// create the general information legend and display on the map
+// (because of the asynchronous execution of the callback functions,
+// this action must be performed within the API call above)
+function makeInfoLegend(date){
+    var legend2 = L.control({position: "bottomleft"});
+    legend2.onAdd = function() {
+        let div2 = L.DomUtil.create("div", "info legend");
+        div2.innerHTML = "<b>Earthquake Magnitude Indicated by Circle Size</b><br>"
+            + "<center>(Click on a circle for earthquake details.)</center><hr>"
+            + "<center>Data Provided by the <a href='https://usgs.gov/'>U.S. Geological Survey</a></center><hr>"
+            + "<center>Last Updated on " + date + "</center>";
+        return div2;
+    };
+    legend2.addTo(myMap);
+};
