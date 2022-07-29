@@ -1,4 +1,4 @@
-# World Earthquakes (JavaScript / Leaflet Demonstration) 
+<h1> World Earthquakes <br> (JavaScript / Leaflet Demonstration) </h1>
 
 This project utilizes JavaScript and the Leaflet library along with HTML and CSS to create a live website to visualize the locations,
 strengths, and depths of earthquakes around the world.
