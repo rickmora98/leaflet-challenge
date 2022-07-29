@@ -1,5 +1,6 @@
 <h1> World Earthquakes <br> (JavaScript / Leaflet Demonstration) </h1>
 
+#### Overview:
 This project utilizes JavaScript and the Leaflet library along with HTML and CSS to create a live website to visualize the locations,
 strengths, and depths of earthquakes around the world.
 The program querrys the USGS earthquake API for the last seven day's earthquake data and displays it on a map in the user's browser.
